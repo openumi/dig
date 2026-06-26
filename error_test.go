@@ -31,7 +31,8 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"go.uber.org/dig/internal/digreflect"
+
+	"github.com/openumi/dig/internal/digreflect"
 )
 
 // assertErrorMatches matches error messages against the provided list of

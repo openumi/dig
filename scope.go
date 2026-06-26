@@ -28,7 +28,7 @@ import (
 	"sort"
 	"time"
 
-	"go.uber.org/dig/internal/digclock"
+	"github.com/openumi/dig/internal/digclock"
 )
 
 // A ScopeOption modifies the default behavior of Scope; currently,

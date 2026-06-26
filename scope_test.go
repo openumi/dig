@@ -24,8 +24,9 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"go.uber.org/dig"
-	"go.uber.org/dig/internal/digtest"
+
+	"github.com/openumi/dig"
+	"github.com/openumi/dig/internal/digtest"
 )
 
 func TestScopedOperations(t *testing.T) {

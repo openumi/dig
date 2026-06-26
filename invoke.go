@@ -24,8 +24,8 @@ import (
 	"fmt"
 	"reflect"
 
-	"go.uber.org/dig/internal/digreflect"
-	"go.uber.org/dig/internal/graph"
+	"github.com/openumi/dig/internal/digreflect"
+	"github.com/openumi/dig/internal/graph"
 )
 
 // An InvokeOption modifies the default behavior of Invoke.

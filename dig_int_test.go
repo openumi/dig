@@ -23,7 +23,7 @@ package dig
 import (
 	"math/rand"
 
-	"go.uber.org/dig/internal/digclock"
+	"github.com/openumi/dig/internal/digclock"
 )
 
 func SetRand(r *rand.Rand) Option {

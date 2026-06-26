@@ -24,9 +24,9 @@ import (
 	"fmt"
 	"reflect"
 
-	"go.uber.org/dig/internal/digerror"
-	"go.uber.org/dig/internal/digreflect"
-	"go.uber.org/dig/internal/dot"
+	"github.com/openumi/dig/internal/digerror"
+	"github.com/openumi/dig/internal/digreflect"
+	"github.com/openumi/dig/internal/dot"
 )
 
 // constructorNode is a node in the dependency graph that represents

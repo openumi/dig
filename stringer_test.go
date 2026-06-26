@@ -24,9 +24,9 @@ import (
 	"math/rand"
 	"testing"
 
+	"github.com/openumi/dig"
+	"github.com/openumi/dig/internal/digtest"
 	"github.com/stretchr/testify/assert"
-	"go.uber.org/dig"
-	"go.uber.org/dig/internal/digtest"
 )
 
 func TestStringer(t *testing.T) {

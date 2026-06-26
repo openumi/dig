@@ -1,4 +1,4 @@
-module go.uber.org/dig
+module github.com/openumi/dig
 
 go 1.20
 
@@ -9,5 +9,3 @@ require (
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
-
-retract v1.16.0 // bad release

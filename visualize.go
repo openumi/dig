@@ -26,7 +26,7 @@ import (
 	"io"
 	"strconv"
 
-	"go.uber.org/dig/internal/dot"
+	"github.com/openumi/dig/internal/dot"
 )
 
 // A VisualizeOption modifies the default behavior of Visualize.

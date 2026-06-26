@@ -29,11 +29,11 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/openumi/dig"
+	"github.com/openumi/dig/internal/digtest"
+	"github.com/openumi/dig/internal/dot"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"go.uber.org/dig"
-	"go.uber.org/dig/internal/digtest"
-	"go.uber.org/dig/internal/dot"
 )
 
 func TestDotGraph(t *testing.T) {

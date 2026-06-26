@@ -25,8 +25,8 @@ import (
 	"math/rand"
 	"reflect"
 
-	"go.uber.org/dig/internal/digclock"
-	"go.uber.org/dig/internal/dot"
+	"github.com/openumi/dig/internal/digclock"
+	"github.com/openumi/dig/internal/dot"
 )
 
 const (

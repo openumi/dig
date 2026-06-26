@@ -26,9 +26,9 @@ import (
 	"reflect"
 	"strings"
 
-	"go.uber.org/dig/internal/digreflect"
-	"go.uber.org/dig/internal/dot"
-	"go.uber.org/dig/internal/graph"
+	"github.com/openumi/dig/internal/digreflect"
+	"github.com/openumi/dig/internal/dot"
+	"github.com/openumi/dig/internal/graph"
 )
 
 // A ProvideOption modifies the default behavior of Provide.

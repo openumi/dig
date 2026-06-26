@@ -27,8 +27,8 @@ import (
 	"strconv"
 	"strings"
 
-	"go.uber.org/dig/internal/digerror"
-	"go.uber.org/dig/internal/dot"
+	"github.com/openumi/dig/internal/digerror"
+	"github.com/openumi/dig/internal/dot"
 )
 
 // The param interface represents a dependency for a constructor.

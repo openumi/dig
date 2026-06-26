@@ -24,8 +24,8 @@ import (
 	"fmt"
 	"reflect"
 
-	"go.uber.org/dig/internal/digerror"
-	"go.uber.org/dig/internal/dot"
+	"github.com/openumi/dig/internal/digerror"
+	"github.com/openumi/dig/internal/dot"
 )
 
 // The result interface represents a result produced by a constructor.
