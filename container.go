@@ -29,6 +29,15 @@ import (
 	"github.com/openumi/dig/internal/dot"
 )
 
+// Container is a directed acyclic graph of types and their dependencies.
+// A Container is the root Scope that represents the top-level scoped
+// directed acyclic graph of the dependencies.
+type Container struct {
+	// this is the "root" Scope that represents the
+	// root of the scope tree.
+	scope *Scope
+}
+
 const (
 	_optionalTag         = "optional"
 	_nameTag             = "name"
@@ -57,15 +66,6 @@ func (k key) String() string {
 // Option configures a Container.
 type Option interface {
 	applyOption(*Container)
-}
-
-// Container is a directed acyclic graph of types and their dependencies.
-// A Container is the root Scope that represents the top-level scoped
-// directed acyclic graph of the dependencies.
-type Container struct {
-	// this is the "root" Scope that represents the
-	// root of the scope tree.
-	scope *Scope
 }
 
 // containerWriter provides write access to the Container's underlying data

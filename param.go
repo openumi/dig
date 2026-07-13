@@ -166,18 +166,6 @@ type paramSingle struct {
 	Type     reflect.Type
 }
 
-func (ps paramSingle) DotParam() []*dot.Param {
-	return []*dot.Param{
-		{
-			Node: &dot.Node{
-				Type: ps.Type,
-				Name: ps.Name,
-			},
-			Optional: ps.Optional,
-		},
-	}
-}
-
 func (ps paramSingle) String() string {
 	// tally.Scope[optional] means optional
 	// tally.Scope[optional, name="foo"] means named optional
@@ -195,55 +183,6 @@ func (ps paramSingle) String() string {
 	}
 
 	return fmt.Sprintf("%v[%v]", ps.Type, strings.Join(opts, ", "))
-}
-
-// search the given container and its ancestors for a decorated value.
-func (ps paramSingle) getDecoratedValue(c containerStore) (reflect.Value, bool) {
-	for _, c := range c.storesToRoot() {
-		if v, ok := c.getDecoratedValue(ps.Name, ps.Type); ok {
-			return v, ok
-		}
-	}
-	return _noValue, false
-}
-
-// builds the parameter using decorators in all scopes that affect the
-// current scope, if there are any. If there are multiple Scopes that decorates
-// this parameter, the closest one to the Scope that invoked this will be used.
-// If there are no decorators associated with this parameter, _noValue is returned.
-func (ps paramSingle) buildWithDecorators(c containerStore) (v reflect.Value, found bool, err error) {
-	var (
-		d               decorator
-		decoratingScope containerStore
-	)
-	stores := c.storesToRoot()
-
-	for _, s := range stores {
-		if d, found = s.getValueDecorator(ps.Name, ps.Type); !found {
-			continue
-		}
-		if d.State() == decoratorOnStack {
-			// This decorator is already being run.
-			// Avoid a cycle and look further.
-			d = nil
-			continue
-		}
-		decoratingScope = s
-		break
-	}
-	if !found || d == nil {
-		return _noValue, false, nil
-	}
-	if err = d.Call(decoratingScope); err != nil {
-		v, err = _noValue, errParamSingleFailed{
-			CtorID: 1,
-			Key:    key{t: ps.Type, name: ps.Name},
-			Reason: err,
-		}
-		return v, found, err
-	}
-	v, _ = decoratingScope.getDecoratedValue(ps.Name, ps.Type)
-	return
 }
 
 func (ps paramSingle) Build(c containerStore) (reflect.Value, error) {
@@ -307,6 +246,67 @@ func (ps paramSingle) Build(c containerStore) (reflect.Value, error) {
 	// container.
 	v, _ = providingContainer.getValue(ps.Name, ps.Type)
 	return v, nil
+}
+
+func (ps paramSingle) DotParam() []*dot.Param {
+	return []*dot.Param{
+		{
+			Node: &dot.Node{
+				Type: ps.Type,
+				Name: ps.Name,
+			},
+			Optional: ps.Optional,
+		},
+	}
+}
+
+// search the given container and its ancestors for a decorated value.
+func (ps paramSingle) getDecoratedValue(c containerStore) (reflect.Value, bool) {
+	for _, c := range c.storesToRoot() {
+		if v, ok := c.getDecoratedValue(ps.Name, ps.Type); ok {
+			return v, ok
+		}
+	}
+	return _noValue, false
+}
+
+// builds the parameter using decorators in all scopes that affect the
+// current scope, if there are any. If there are multiple Scopes that decorates
+// this parameter, the closest one to the Scope that invoked this will be used.
+// If there are no decorators associated with this parameter, _noValue is returned.
+func (ps paramSingle) buildWithDecorators(c containerStore) (v reflect.Value, found bool, err error) {
+	var (
+		d               decorator
+		decoratingScope containerStore
+	)
+	stores := c.storesToRoot()
+
+	for _, s := range stores {
+		if d, found = s.getValueDecorator(ps.Name, ps.Type); !found {
+			continue
+		}
+		if d.State() == decoratorOnStack {
+			// This decorator is already being run.
+			// Avoid a cycle and look further.
+			d = nil
+			continue
+		}
+		decoratingScope = s
+		break
+	}
+	if !found || d == nil {
+		return _noValue, false, nil
+	}
+	if err = d.Call(decoratingScope); err != nil {
+		v, err = _noValue, errParamSingleFailed{
+			CtorID: 1,
+			Key:    key{t: ps.Type, name: ps.Name},
+			Reason: err,
+		}
+		return v, found, err
+	}
+	v, _ = decoratingScope.getDecoratedValue(ps.Name, ps.Type)
+	return
 }
 
 // paramObject is a dig.In struct where each field is another param.
