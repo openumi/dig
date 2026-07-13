@@ -21,105 +21,8 @@
 package dot
 
 import (
-	"fmt"
 	"reflect"
 )
-
-// ErrorType of a constructor or group is updated when they fail to build.
-type ErrorType int
-
-const (
-	noError ErrorType = iota
-	rootCause
-	transitiveFailure
-)
-
-// CtorID is a unique numeric identifier for constructors.
-type CtorID uintptr
-
-// Ctor encodes a constructor provided to the container for the DOT graph.
-type Ctor struct {
-	Name        string
-	Package     string
-	File        string
-	Line        int
-	ID          CtorID
-	Params      []*Param
-	GroupParams []*Group
-	Results     []*Result
-	ErrorType   ErrorType
-}
-
-// removeParam deletes the dependency on the provided result's nodeKey.
-// This is used to prune links to results of deleted constructors.
-func (c *Ctor) removeParam(k nodeKey) {
-	var pruned []*Param
-	for _, p := range c.Params {
-		if k != p.nodeKey() {
-			pruned = append(pruned, p)
-		}
-	}
-	c.Params = pruned
-}
-
-type nodeKey struct {
-	t     reflect.Type
-	name  string
-	group string
-}
-
-// Node is a single node in a graph and is embedded into Params and Results.
-type Node struct {
-	Type  reflect.Type
-	Name  string
-	Group string
-}
-
-func (n *Node) nodeKey() nodeKey {
-	return nodeKey{t: n.Type, name: n.Name, group: n.Group}
-}
-
-// Param is a parameter node in the graph. Parameters are the input to constructors.
-type Param struct {
-	*Node
-
-	Optional bool
-}
-
-// Result is a result node in the graph. Results are the output of constructors.
-type Result struct {
-	*Node
-
-	// GroupIndex is added to differentiate grouped values from one another.
-	// Since grouped values have the same type and group, their Node / string
-	// representations are the same so we need indices to uniquely identify
-	// the values.
-	GroupIndex int
-}
-
-// Group is a group node in the graph. Group represents an fx value group.
-type Group struct {
-	// Type is the type of values in the group.
-	Type      reflect.Type
-	Name      string
-	Results   []*Result
-	ErrorType ErrorType
-}
-
-func (g *Group) nodeKey() nodeKey {
-	return nodeKey{t: g.Type, group: g.Name}
-}
-
-// TODO(rhang): Avoid linear search to discover group results that should be pruned.
-func (g *Group) removeResult(r *Result) {
-	var pruned []*Result
-	for _, rg := range g.Results {
-		if r.GroupIndex != rg.GroupIndex {
-			pruned = append(pruned, rg)
-		}
-	}
-	g.Results = pruned
-}
 
 // Graph is the DOT-format graph in a Container.
 type Graph struct {
@@ -164,14 +67,6 @@ func NewGraph() *Graph {
 			ctors:  make(map[CtorID]struct{}),
 			groups: make(map[nodeKey]struct{}),
 		},
-	}
-}
-
-// NewGroup creates a new group with information in the groupKey.
-func NewGroup(k nodeKey) *Group {
-	return &Group{
-		Type: k.t,
-		Name: k.group,
 	}
 }
 
@@ -396,64 +291,6 @@ func (dg *Graph) pruneGroupResults(c *Ctor, groups map[nodeKey]*Group) {
 		if ok {
 			g.removeResult(r)
 		}
-	}
-}
-
-// String implements fmt.Stringer for Param.
-func (p *Param) String() string {
-	if p.Name != "" {
-		return fmt.Sprintf("%v[name=%v]", p.Type.String(), p.Name)
-	}
-	return p.Type.String()
-}
-
-// String implements fmt.Stringer for Result.
-func (r *Result) String() string {
-	switch {
-	case r.Name != "":
-		return fmt.Sprintf("%v[name=%v]", r.Type.String(), r.Name)
-	case r.Group != "":
-		return fmt.Sprintf("%v[group=%v]%v", r.Type.String(), r.Group, r.GroupIndex)
-	default:
-		return r.Type.String()
-	}
-}
-
-// String implements fmt.Stringer for Group.
-func (g *Group) String() string {
-	return fmt.Sprintf("[type=%v group=%v]", g.Type.String(), g.Name)
-}
-
-// Attributes composes and returns a string of the Result node's attributes.
-func (r *Result) Attributes() string {
-	switch {
-	case r.Name != "":
-		return fmt.Sprintf(`label=<%v<BR /><FONT POINT-SIZE="10">Name: %v</FONT>>`, r.Type, r.Name)
-	case r.Group != "":
-		return fmt.Sprintf(`label=<%v<BR /><FONT POINT-SIZE="10">Group: %v</FONT>>`, r.Type, r.Group)
-	default:
-		return fmt.Sprintf(`label=<%v>`, r.Type)
-	}
-}
-
-// Attributes composes and returns a string of the Group node's attributes.
-func (g *Group) Attributes() string {
-	attr := fmt.Sprintf(`shape=diamond label=<%v<BR /><FONT POINT-SIZE="10">Group: %v</FONT>>`, g.Type, g.Name)
-	if g.ErrorType != noError {
-		attr += " color=" + g.ErrorType.Color()
-	}
-	return attr
-}
-
-// Color returns the color representation of each ErrorType.
-func (s ErrorType) Color() string {
-	switch s {
-	case rootCause:
-		return "red"
-	case transitiveFailure:
-		return "orange"
-	default:
-		return "black"
 	}
 }
 
